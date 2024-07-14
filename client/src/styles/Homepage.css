@@ -98,3 +98,8 @@ Filters
   font-weight: bold;
   font-size: 20px !important;
 }
+
+.ms-2{
+  background-color: green;
+  color: #fff;
+}

@@ -5,21 +5,22 @@ const orderSchema = new mongoose.Schema(
     products: [
       {
         type: mongoose.ObjectId,
-        ref: "Products",
+        ref: "Products", // Ensure "Products" matches your actual collection name
       },
     ],
-    payment: {},
     buyer: {
       type: mongoose.ObjectId,
-      ref: "users",
+      ref: "users", // Ensure "users" matches your actual collection name
     },
     status: {
       type: String,
       default: "Not Process",
-      enum: ["Not Process", "Processing", "Shipped", "deliverd", "cancel"],
+      enum: ["Not Process", "Processing", "Shipped", "delivered", "cancel"],
     },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Order", orderSchema);
+const Order = mongoose.model("Order", orderSchema);
+
+export default Order;

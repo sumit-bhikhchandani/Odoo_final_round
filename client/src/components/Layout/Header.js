@@ -6,6 +6,7 @@ import SearchInput from "../Form/SearchInput";
 import useCategory from "../../hooks/useCategory";
 import { useCart } from "../../context/cart";
 import { Badge } from "antd";
+import "../../styles/Header.css";
 
 const Header = () => {
   const [auth, setAuth] = useAuth();
@@ -63,7 +64,7 @@ const Header = () => {
                   {categories?.map((c) => (
                     <li>
                       <Link
-                        className="dropdown-item"
+                        className="dropdown-item name"
                         to={`/category/${c.slug}`}
                       >
                         {c.name}
@@ -106,14 +107,14 @@ const Header = () => {
                           }`}
                           className="dropdown-item"
                         >
-                          Dashboard
+                          User Profile
                         </NavLink>
                       </li>
                       <li>
                         <NavLink
                           onClick={handleLogout}
                           to="/login"
-                          className="dropdown-item"
+                          className="dropdown-item text-danger"
                         >
                           Logout
                         </NavLink>
@@ -122,13 +123,7 @@ const Header = () => {
                   </li>
                 </>
               )}
-              <li className="nav-item">
-                <NavLink to="/cart" className="nav-link">
-                  <Badge count={cart?.length} showZero offset={[10, -5]}>
-                    Cart
-                  </Badge>
-                </NavLink>
-              </li>
+              
             </ul>
           </div>
         </div>

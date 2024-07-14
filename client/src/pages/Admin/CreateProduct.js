@@ -12,7 +12,7 @@ const CreateProduct = () => {
   const [categories, setCategories] = useState([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [author, setAuthor] = useState("");
+  const [price, setPrice] = useState("");
   const [category, setCategory] = useState("");
   const [quantity, setQuantity] = useState("");
   const [photo, setPhoto] = useState("");
@@ -33,7 +33,6 @@ const CreateProduct = () => {
           name: bookInfo.title || "",
           description: bookInfo.description || "",
           photo: bookInfo.imageLinks?.thumbnail || "",
-          author: bookInfo.authors ? bookInfo.authors.join(", ") : ""
           // You may add more fields as needed (author, publisher, etc.)
         };
         setBookDetails(fetchedDetails);
@@ -41,7 +40,6 @@ const CreateProduct = () => {
         setName(fetchedDetails.name);
         setDescription(fetchedDetails.description);
         setPhoto(fetchedDetails.photo);
-        setAuthor(fetchedDetails.author);
       } else {
         toast.error("Book not found. Please check the ISBN.");
       }
@@ -58,7 +56,7 @@ const CreateProduct = () => {
       const productData = new FormData();
       productData.append("name", name);
       productData.append("description", description);
-      productData.append("author", author);
+      productData.append("price", price);
       productData.append("quantity", quantity);
       productData.append("photo", photo);
       productData.append("category", category);
@@ -171,13 +169,6 @@ const CreateProduct = () => {
                         hidden
                       />
                     </label>
-                    {bookDetails.photo && (
-                      <img
-                        src={bookDetails.photo}
-                        alt="Book Cover"
-                        style={{ maxWidth: "100%", marginTop: "10px" }}
-                      />
-                    )}
                   </div>
                   <div className="mb-3">
                     <input
@@ -195,6 +186,15 @@ const CreateProduct = () => {
                       placeholder="Write a description"
                       className="form-control"
                       onChange={(e) => setDescription(e.target.value)}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <input
+                      type="number"
+                      value={price}
+                      placeholder="Write a Price"
+                      className="form-control"
+                      onChange={(e) => setPrice(e.target.value)}
                     />
                   </div>
                   <div className="mb-3">

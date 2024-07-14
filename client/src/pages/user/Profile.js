@@ -1,54 +1,76 @@
 import React, { useState, useEffect } from "react";
-import UserMenu from "../../components/Layout/UserMenu";
 import Layout from "./../../components/Layout/Layout";
+import UserMenu from "../../components/Layout/UserMenu";
 import { useAuth } from "../../context/auth";
 import toast from "react-hot-toast";
 import axios from "axios";
+import { Card } from "antd"; // Import Card component from Ant Design
+
 const Profile = () => {
-  //context
+  // Context
   const [auth, setAuth] = useAuth();
-  //state
+
+  // State
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
+  const [isbn, setIsbn] = useState(""); // State for ISBN input
+  const [bookDetails, setBookDetails] = useState(null); // State for fetched book details
 
-  //get user data
+  // Fetch user data on component mount
   useEffect(() => {
-    const { email, name, phone, address } = auth?.user;
-    setName(name);
-    setPhone(phone);
-    setEmail(email);
-    setAddress(address);
+    const { email, name, phone, address } = auth?.user || {};
+    setName(name || "");
+    setPhone(phone || "");
+    setEmail(email || "");
+    setAddress(address || "");
   }, [auth?.user]);
 
-  // form function
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Function to fetch book details from Google Books API.
+  const fetchBookDetails = async () => {
     try {
-      const { data } = await axios.put("/api/v1/auth/profile", {
-        name,
-        email,
-        password,
-        phone,
-        address,
-      });
-      if (data?.errro) {
-        toast.error(data?.error);
+      const { data } = await axios.get(
+        `https://www.googleapis.com/books/v1/volumes?q=ISBN:${isbn}`
+      );
+      console.log("Google Books API response:", data); // Log API response for debugging
+
+      if (data.items && data.items.length > 0) {
+        const bookInfo = data.items[0].volumeInfo;
+        const fetchedDetails = {
+          name: bookInfo.title || "",
+          description: bookInfo.description || "",
+          photo: bookInfo.imageLinks?.thumbnail || "",
+          // You may add more fields as needed (author, publisher, etc.)
+        };
+        setBookDetails(fetchedDetails);
+        // Autofill form fields with fetched book details (optional for profile)
+        // setName(fetchedDetails.name);
+        // setDescription(fetchedDetails.description);
+        // setPhoto(fetchedDetails.photo);
       } else {
-        setAuth({ ...auth, user: data?.updatedUser });
-        let ls = localStorage.getItem("auth");
-        ls = JSON.parse(ls);
-        ls.user = data.updatedUser;
-        localStorage.setItem("auth", JSON.stringify(ls));
-        toast.success("Profile Updated Successfully");
+        toast.error("Book not found. Please check the ISBN.");
       }
     } catch (error) {
-      console.log(error);
-      toast.error("Something went wrong");
+      console.error("Error fetching book details:", error);
+      toast.error("Failed to fetch book details. Please try again later.");
     }
   };
+
+  // Function to handle ISBN input change
+  const handleISBNChange = (e) => {
+    setIsbn(e.target.value);
+  };
+
+  // Function to handle form submission (optional for profile)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Handle profile update logic here
+    // Example: Update user profile using axios.put
+    // const { data } = await axios.put("/api/v1/auth/profile", { name, email, phone, address });
+    // Handle success/error responses
+  };
+
   return (
     <Layout title={"Your Profile"}>
       <div className="container-fluid m-3 p-3 dashboard">
@@ -66,7 +88,6 @@ const Profile = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="form-control"
-                    id="exampleInputEmail1"
                     placeholder="Enter Your Name"
                     autoFocus
                   />
@@ -75,21 +96,9 @@ const Profile = () => {
                   <input
                     type="email"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
                     className="form-control"
-                    id="exampleInputEmail1"
-                    placeholder="Enter Your Email "
+                    placeholder="Enter Your Email"
                     disabled
-                  />
-                </div>
-                <div className="mb-3">
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="form-control"
-                    id="exampleInputPassword1"
-                    placeholder="Enter Your Password"
                   />
                 </div>
                 <div className="mb-3">
@@ -98,7 +107,6 @@ const Profile = () => {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="form-control"
-                    id="exampleInputEmail1"
                     placeholder="Enter Your Phone"
                   />
                 </div>
@@ -108,13 +116,50 @@ const Profile = () => {
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
                     className="form-control"
-                    id="exampleInputEmail1"
                     placeholder="Enter Your Address"
                   />
                 </div>
 
+                {/* ISBN Input and Fetch Button */}
+                <div className="mb-3">
+                  <input
+                    type="text"
+                    value={isbn}
+                    placeholder="Enter ISBN to fetch book details"
+                    className="form-control"
+                    onChange={handleISBNChange}
+                  />
+                  <button
+                    className="btn btn-outline-secondary mt-2"
+                    onClick={fetchBookDetails}
+                  >
+                    Fetch Book Details
+                  </button>
+                </div>
+
+                {/* Display Book Details if Fetched */}
+                {bookDetails && (
+                  <Card
+                    title={bookDetails.name}
+                    style={{ width: "100%", marginBottom: "20px" }}
+                  >
+                    <div className="text-center">
+                      {bookDetails.photo && (
+                        <img
+                          src={bookDetails.photo}
+                          alt="book_photo"
+                          height={"200px"}
+                          className="img img-responsive"
+                        />
+                      )}
+                    </div>
+                    <p>{bookDetails.description}</p>
+                  </Card>
+                )}
+
+                {/* Update Profile Button */}
                 <button type="submit" className="btn btn-primary">
-                  UPDATE
+                  UPDATE PROFILE
                 </button>
               </form>
             </div>

@@ -7,6 +7,7 @@ import Layout from "./../components/Layout/Layout";
 import { AiOutlineReload } from "react-icons/ai";
 import Dashboard from "./user/Dashboard";
 import "../styles/Homepage.css";
+import SearchInput from "../components/Form/SearchInput";
 
 const HomePage = () => {
   const navigate = useNavigate();
@@ -61,15 +62,7 @@ const HomePage = () => {
 
   return (
     <Layout title={"ALL Products - Best offers"}>
-      {/* banner image */}
-      <img
-        src="https://media.istockphoto.com/id/1498878143/photo/book-stack-and-open-book-on-the-desk-in-modern-public-library.webp?b=1&s=170667a&w=0&k=20&c=T63zJBKuZLTUQwwAAwLzbMwtzAEdd4wZRaEV6EAdUnA="
-        className="banner-img"
-        alt="bannerimage"
-        width={"100%"}
-        height={"300px"}
-      />
-      {/* banner image */}
+      <SearchInput />
       <div className="container-fluid row mt-3 home-page">
         <div className="col-md-3">
           <Dashboard />
@@ -87,30 +80,28 @@ const HomePage = () => {
                 <div className="card-body">
                   <div className="card-name-price">
                     <h5 className="card-title">{p.name}</h5>
-                    
                   </div>
                   <p className="card-text ">
-                    {p.description.substring(0, 60)}...
+                    {p.description}
                   </p>
                   <div className="card-name-price">
-                    <button
+                    {/* <button
                       className="btn btn-info ms-1"
                       onClick={() => navigate(`/product/${p.slug}`)}
                     >
                       More Details
-                    </button>
+                    </button> */}
                     <button
-                      className="btn btn-dark ms-1"
+                      className={`ms-2 ${p.quantity === 0 ? "btn btn-danger" : "btn btn-success"}`}
                       onClick={() => {
-                        setCart([...cart, p]);
-                        localStorage.setItem(
-                          "cart",
-                          JSON.stringify([...cart, p])
-                        );
-                        toast.success("Item Added to cart");
+                        if (p.quantity !== 0) {
+                          setCart([...cart, p]);
+                          localStorage.setItem("cart", JSON.stringify([...cart, p]));
+                        }
                       }}
+                      disabled={p.quantity === 0}
                     >
-                      ADD TO CART
+                      {p.quantity === 0 ? "Not Available" : "Available"}
                     </button>
                   </div>
                 </div>
@@ -130,7 +121,6 @@ const HomePage = () => {
                   "Loading ..."
                 ) : (
                   <>
-                    {" "}
                     Load more <AiOutlineReload />
                   </>
                 )}
